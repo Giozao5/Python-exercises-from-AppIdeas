@@ -1,0 +1,70 @@
+import tkinter as tk
+
+def criar_circulo(canvas, x, y, raio, cor):
+    return canvas.create_oval(x - raio, y - raio, x + raio, y + raio, fill=cor, outline="")
+
+def criar_botao(frame, texto, comando, x, y, width=10, height=0):
+    botao = tk.Button(frame, command=comando, text=texto, width=width, height=height, bg="#eceff1", fg="#212121", font=("Ivy 15 bold"), overrelief="ridge", anchor="center", justify="center")
+    botao.place(x=x, y=y)
+
+def start_stop():
+    global piscando
+    if not piscando:
+        piscando = True
+        piscar()
+    else:
+        piscando = False
+
+def piscar():
+    if piscando:
+        for i, circle in enumerate(circles):
+            canvas.itemconfig(circle, fill=bright_colors[i])
+        janela.after(interval, apagar)
+
+def apagar():
+    if piscando:
+        for i, circle in enumerate(circles):
+            canvas.itemconfig(circle, fill=colors[i])
+        janela.after(interval, piscar)
+
+def aumentar_velocidade():
+    global interval
+    interval -= 100
+    if interval < 100:
+        interval = 100
+    label_velocidade.configure(text=f"Velocidade: {interval/1000:.1f}s")
+
+def diminuir_velocidade():
+    global interval
+    interval += 100
+    label_velocidade.configure(text=f"Velocidade: {interval/1000:.1f}s")
+
+janela = tk.Tk()
+janela.title("Christmas Lights")
+janela.minsize(500, 150)
+janela.maxsize(500, 150)
+janela.configure(background="#212121")
+
+frame_superior = tk.Frame(janela, width=500, height=50, bg="#212121")
+frame_superior.grid(row=0, column=0)
+
+canvas = tk.Canvas(janela, width=500, height=100, bg="#212121", highlightthickness=0)
+canvas.grid(row=1, column=0)
+
+circles = []
+colors = ["#d10000", "#d17600", "#e8e000", "#aae800", "#002ee8", "#b802b2"]
+bright_colors = ["#ff5e5e", "#ffbd7a", "#ffff96", "#8aff8a", "#78bdff", "#ff7aff"]
+interval = 500
+piscando = False
+
+for i, color in enumerate(colors):
+    circle = criar_circulo(canvas, 50 + i * 50, 50, 20, color)
+    circles.append(circle)
+
+criar_botao(frame_superior, "Start/Stop", start_stop, 10, 10)
+criar_botao(frame_superior, "+", aumentar_velocidade, 200, 10, width=2)
+criar_botao(frame_superior, "-", diminuir_velocidade, 240, 10, width=2)
+label_velocidade = tk.Label(frame_superior, text="Velocidade: 0.5s", bg="#212121", fg="#eceff1")
+label_velocidade.place(x=300, y=10)
+
+janela.mainloop()
